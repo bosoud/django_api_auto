@@ -2,18 +2,20 @@ import os
 import sys
 
 # Get project path and app name from command line arguments
-project_dir = os.path.abspath(os.path.expanduser(sys.argv[1]))
-project_name = os.path.basename(project_dir)
-app_name = sys.argv[2]
+project_path = os.path.abspath(os.path.expanduser(sys.argv[1]))
+project_name = os.path.basename(sys.argv[2])
+app_name = sys.argv[3]
+
 
 # Create directories for app and templates
-app_dir = os.path.join(project_dir, app_name)
+app_dir = os.path.join(project_path, app_name)
 os.makedirs(app_dir, exist_ok=True)
 templates_dir = os.path.join(app_dir, "templates")
 os.makedirs(templates_dir, exist_ok=True)
 
 # Add DRF Spectacular to settings.py
-settings_file = os.path.join(project_dir, project_name, "settings.py")
+settings_file = os.path.join(project_path, project_name, "settings.py")
+print(f"Settings file path: {settings_file}")
 with open(settings_file, "a") as f:
     f.write("\nREST_FRAMEWORK = {\n    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema'\n}\n")
 print(f"\nDRF Spectacular added to settings.py at {settings_file}.")
@@ -34,7 +36,7 @@ print(f"\nviews.py file for user registration created successfully at {views_fil
 
 # Update urls.py file to include user registration URL
 # Update project's urls.py file to include DRF Spectacular schema view and UI
-project_urls_file = os.path.join(project_dir, project_name, "urls.py")
+project_urls_file = os.path.join(project_path, project_name, "urls.py")
 with open(project_urls_file, "a") as f:
     f.write(f"\nfrom drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView\n\n")
     f.write(f"\nfrom django.urls import include\n\n")
@@ -47,8 +49,9 @@ with open(project_urls_file, "a") as f:
 print(f"\nURL pattern for app {app_name} added successfully to {project_urls_file}.")
 print(f"\nDRF Spectacular schema view and UI added to {project_urls_file}.")
 
-app_urls_file = f"{project_name}/{app_name}/urls.py"
-with open(app_urls_file, "a") as f:
+app_urls_file = os.path.join(project_path, app_name, "urls.py")
+# Create the app's urls.py file before appending content
+with open(app_urls_file, "w") as f:
     f.write(f"\nfrom {app_name} import views\nfrom django.urls import path\n\n")
     f.write(f"urlpatterns = [\n    path('register/', views.UserRegistrationView.as_view()),\n]\n")
 print(f"\nURL pattern for user registration added successfully to {app_urls_file}.")
